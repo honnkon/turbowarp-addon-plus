@@ -24,7 +24,7 @@ class VDOM {
 	}
 }
 
-function h(text: string, children: VDOM | string = "") {
+function h(text: string, children: VDOM | string = ""): VDOM {
 	const tag = text.match(/<(\w+)( ?[^>]*)*>(.*?)<\/\1>/);
 	if (tag) {
 		const nodeTag = tag[1];
@@ -53,7 +53,7 @@ if (main !== null) {
 	let toggle = h('<div class="toggle"></div>', h('<div class="toggle-off"></div>')).render();
 	main.appendChild(toggle);
 	toggle.addEventListener("click", () => {
-		//@ts-ignore
+		// @ts-ignore
 		toggle.firstChild.className = toggle.firstChild.className=="toggle-off"?"toggle-on":"toggle-off"
 	})
 }

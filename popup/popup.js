@@ -51,7 +51,7 @@ if (main !== null) {
     let toggle = h('<div class="toggle"></div>', h('<div class="toggle-off"></div>')).render();
     main.appendChild(toggle);
     toggle.addEventListener("click", () => {
-        //@ts-ignore
+        // @ts-ignore
         toggle.firstChild.className = toggle.firstChild.className == "toggle-off" ? "toggle-on" : "toggle-off";
     });
 }

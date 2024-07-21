@@ -1,4 +1,13 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 // 仮想DOMを制御するクラス
 class VDOM {
     constructor(nodeTag, attributes, children) {
@@ -45,13 +54,47 @@ function h(text, children = "") {
         throw new SyntaxError("Invalid DOM");
     }
 }
-const main = document.querySelector("#container");
-if (main !== null) {
-    main.innerHTML = "";
-    let toggle = h('<div class="toggle"></div>', h('<div class="toggle-off"></div>')).render();
-    main.appendChild(toggle);
+function toggleBoxCreate(toggleItem, titleText = "", explain = "") {
+    let toggle;
+    let title;
+    let explaining;
+    let container;
+    if ((settings === null || settings === void 0 ? void 0 : settings[toggleItem]) == undefined) {
+        // @ts-ignore
+        settings[toggleItem] = false;
+    }
+    toggle = h(`<div class="toggle"></div>`, h(`<div class="toggle-${settings[toggleItem] ? 'on' : 'off'}"></div>`)).render();
+    title = h(`<div class="title"></div>`, titleText).render();
+    explaining = h(`<div class="explaining"></div>`, explain).render();
+    container = h(`<div class="content"></div>`).render();
+    container.appendChild(toggle);
+    container.appendChild(title);
+    container.appendChild(explaining);
+    // @ts-ignore
+    main.appendChild(container);
     toggle.addEventListener("click", () => {
         // @ts-ignore
-        toggle.firstChild.className = toggle.firstChild.className == "toggle-off" ? "toggle-on" : "toggle-off";
+        const toggleIf = toggle.firstChild.className == "toggle-on";
+        // @ts-ignore
+        toggle.firstChild.className = toggleIf ? "toggle-off" : "toggle-on";
+        settings[toggleItem] = !toggleIf;
+        // @ts-ignore
+        chrome.storage.sync.set(settings);
     });
+}
+function Main() {
+    return __awaiter(this, void 0, void 0, function* () {
+        yield chrome.storage.sync.get(null).then((data) => {
+            settings = data;
+        });
+        toggleBoxCreate("footerLinks", "フッターを新しいタブで開く", "turbowarpページのフッターを新しいタブで開くようにする。");
+        toggleBoxCreate("addonInWindow", "アドオン ウィンドウ", "turbowarp addonページをウィンドウで開くようにする。");
+        toggleBoxCreate("extensionInNewTab", "拡張機能を新しいタブで開く", "turbowarp extensionページの拡張機能を新しいタブで開くようにする。");
+    });
+}
+const main = document.querySelector("#container");
+let settings;
+if (main !== null) {
+    main.innerHTML = "";
+    Main();
 }

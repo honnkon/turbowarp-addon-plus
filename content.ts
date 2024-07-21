@@ -30,15 +30,22 @@ function ExtensionInNewTab() {
 	});
 }
 
-function Main() {
+async function Loaded() {
+	let settings: any;
+	await chrome.storage.sync.get(null).then((data: any) => {
+		settings = data;
+	})
 	if (location.host === "turbowarp.org") {
-		FooterLinks();
-		AddonInWindow();
+		if (settings.footerLinks) FooterLinks()
+		else settings.footerLinks = false;
+		if (settings.addonInWindow) AddonInWindow()
+		else settings.addonInWindow = false;
 	}
 
 	if (location.host === "extensions.turbowarp.org") {
-		ExtensionInNewTab();
+		if (settings.ExtensionInNewTab) ExtensionInNewTab()
+		else settings.extensionInNewTab = false;
 	}
 }
 
-Main();
+Loaded();
